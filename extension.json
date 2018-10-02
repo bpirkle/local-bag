@@ -1,0 +1,30 @@
+{
+	"name": "LocalBag",
+	"version": "0.1.0",
+	"author": [
+		"Bill Pirkle"
+	],
+	"license-name": "GPL-2.0-or-later",
+	"url": "https://www.mediawiki.org/wiki/User:BPirkle_(WMF)",
+	"descriptionmsg": "localbag-desc",
+	"type": "other",
+	"config": {
+		"LocalBagExampleConfigVariable": true
+	},
+	"ExtensionFunctions": [
+		"LocalBag::setup"
+	],
+	"MessagesDirs": {
+		"LocalBag": [
+			"i18n"
+		]
+	},
+	"AutoloadClasses": {
+		"LocalBag": "LocalBag.class.php"
+	},
+	"Hooks": {
+		"BeforePageDisplay": "LocalBag::beforePageDisplay",
+		"AfterFinalPageOutput": "LocalBag::afterFinalPageOutput"
+	},
+	"manifest_version": 2
+}
