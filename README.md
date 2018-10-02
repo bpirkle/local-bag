@@ -1,2 +1,13 @@
 # local-bag
 A personal MediaWiki extension to facilitate local development
+
+LocalBag is a small MediaWiki extension to facilitate local development.
+It is simply a place to stuff whatever code may be helpful, normally by
+implementing a MediaWiki hook.
+
+Its name was inspired by the MediaWiki class BagOStuff.
+
+If anyone finds it useful, that's great.  But it was created as a personal
+project, and it is very much tied to the author's local development setup.
+
+More details here: https://www.mediawiki.org/wiki/User:BPirkle_(WMF)
