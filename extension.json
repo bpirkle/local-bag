@@ -8,9 +8,6 @@
 	"url": "https://www.mediawiki.org/wiki/User:BPirkle_(WMF)",
 	"descriptionmsg": "localbag-desc",
 	"type": "other",
-	"config": {
-		"LocalBagExampleConfigVariable": true
-	},
 	"ExtensionFunctions": [
 		"LocalBag::setup"
 	],
