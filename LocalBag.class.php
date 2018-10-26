@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Copyright © 2003-2008 Brion Vibber <brion@pobox.com>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,14 +16,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * http://www.gnu.org/copyleft/gpl.html
  *
- * Main class for the LocalBag MediaWiki extension.
- * This extension is miscellaneous local code that should never be pushed to the remote.
- *
  * @file
  * @ingroup Extensions
  */
+
+/**
+ * Class LocalBag
+ *
+ * Main class for the LocalBag MediaWiki extension.
+ * This extension is miscellaneous local code that should never be pushed to the remote.
+ */
 class LocalBag {
 	public static function setup() {
+		if ( PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' ) {
+			register_shutdown_function( 'LocalBag::shutdownFn' );
+		}
 		return true;
 	}
 
@@ -41,7 +46,10 @@ class LocalBag {
 	}
 
 	/**
-	 * Append custom output at the bottom of the page
+	 * Append custom output at the bottom of the page.
+	 *
+	 * Executes a file of the form T123456.php in the "local" directory under the mediawiki
+	 * installation.  Fails gracefully if no such file exists.
 	 *
 	 * @param $output
 	 * @return bool
@@ -52,7 +60,35 @@ class LocalBag {
 
 		// Append custom additions additions (normally debugging output, but can vary per task)
 		ob_start();
-		require_once '/vagrant/mediawiki/local/local.php';
+
+		global $wgLocalTask;
+		$localTask = $wgLocalTask ?? 'No local task specified';
+		print '<hr>--- ' . $localTask . ' ---<hr><div style="margin: 10"><pre>';
+
+		if ( class_exists( 'LocalBagLogger' ) ) {
+			if ( count( LocalBagLogger::getMessages() ) > 0 ) {
+				print '<h2>Dubious queries</h2>';
+				print '<ul>';
+				foreach ( LocalBagLogger::getMessages() as $msg ) {
+					print "<li>$msg</li>";
+				}
+				print '</ul>';
+			} else {
+				print 'No dubious queries found<br />';
+			}
+		} else {
+			print 'Dubious query detection not configured<br />';
+		}
+
+		$localTaskFile = __DIR__ . '/../../local/' . $localTask . '.php';
+		if ( is_file( $localTaskFile ) ) {
+			include_once $localTaskFile;
+		} else {
+			print "$localTaskFile not found";
+		}
+		print '</pre><div>';
+
+
 		$out .= ob_get_clean();
 
 		// Restore the normal output to the output buffer, with custom additions appended.
@@ -60,5 +96,38 @@ class LocalBag {
 		echo $out;
 
 		return true;
+	}
+
+	/**
+	 * Append debugging output at the end of a command line run
+	 *
+	 * Executes a file of the form T123456Cli.php in the "local" directory under the mediawiki
+	 * installation.  Fails gracefully if no such file exists.
+	 */
+	public static function shutdownFn() {
+		global $wgLocalTask;
+		$localTask = $wgLocalTask ?? 'No local task specified';
+		print '--- ' . $localTask . ' ---';
+
+		if ( class_exists( 'LocalBagLogger' ) ) {
+			if ( count( LocalBagLogger::getMessages() ) > 0 ) {
+				print "Dubious queries\n";
+				foreach ( LocalBagLogger::getMessages() as $msg ) {
+					print "* $msg\n";
+				}
+			} else {
+				print "No dubious queries found\n";
+			}
+		} else {
+			print "Dubious query detection not configured\n";
+		}
+
+		// Should this hit a T123456Cli.php file instead, to allow give different CLI vs web?
+		$localTaskFile = __DIR__ . '/../../local/' . $localTask . 'Cli.php';
+		if ( is_file( $localTaskFile ) ) {
+			include_once $localTaskFile;
+		} else {
+			print "$localTaskFile not found\n";
+		}
 	}
 }

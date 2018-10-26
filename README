@@ -1,5 +1,4 @@
-# local-bag
-A personal MediaWiki extension to facilitate local development
+== LocalBag ==
 
 LocalBag is a small MediaWiki extension to facilitate local development.
 It is simply a place to stuff whatever code may be helpful, normally by

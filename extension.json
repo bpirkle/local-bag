@@ -17,7 +17,8 @@
 		]
 	},
 	"AutoloadClasses": {
-		"LocalBag": "LocalBag.class.php"
+		"LocalBag": "LocalBag.class.php",
+		"LocalBagSpi": "includes/LocalBagSpi.php"
 	},
 	"Hooks": {
 		"BeforePageDisplay": "LocalBag::beforePageDisplay",

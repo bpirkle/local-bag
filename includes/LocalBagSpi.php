@@ -1,6 +1,7 @@
 <?php
-
 /**
+ * Copyright © 2018 Bill Pirkle <bill@pirkle.me>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +16,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * http://www.gnu.org/copyleft/gpl.html
+ *
+ * @file
  */
 
-if ( !defined( 'MEDIAWIKI' ) ) {
-	echo "This file is an extension to the MediaWiki software and cannot be used standalone\n";
-	die( 1 );
+/**
+ * Add specialized logger for database queries.
+ */
+class LocalBagSpi extends \MediaWiki\Logger\LegacySpi {
+	function __construct() {
+		$this->singletons['DBQuery'] = new LocalBagLogger( 'DBQuery' );
+	}
 }
