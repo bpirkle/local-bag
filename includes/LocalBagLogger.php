@@ -38,13 +38,6 @@
 class LocalBagLogger extends MediaWiki\Logger\LegacyLogger {
 	protected static $msgs = [];
 
-	// Well-known false positives.  Ignore to reduce noise.
-	// Should this be per-task configurable via the LocalSettingsT123456.php files?
-	protected static $ignoreNeedles = [
-		'SELECT  ipb_id,ipb_address,ipb_timestamp,ipb_auto,ipb_anon_only,ipb_create_account,ipb_enable_autoblock,ipb_expiry,ipb_deleted,ipb_block_email,ipb_allow_usertalk,ipb_parent_block_id,ipb_reason AS `ipb_reason_text`,NULL AS `ipb_reason_data`,NULL AS `ipb_reason_cid`,ipb_by,ipb_by_text,NULL AS `ipb_by_actor`  FROM `ipblocks`    WHERE ipb_address',
-		'SELECT  page_id,page_len,page_is_redirect,page_latest,page_content_model,page_namespace,page_title  FROM `page`    WHERE',
-	];
-
 	public static function getMessages() {
 		return self::$msgs;
 	}
@@ -59,10 +52,13 @@ class LocalBagLogger extends MediaWiki\Logger\LegacyLogger {
 	 */
 	public function log( $level, $message, array $context = [] ) {
 		if ( $this-> channel === 'DBQuery' && strpos( $message, 'SELECT' ) === 0 ) {
+			global $wgLocalBagIgnoreNeedles;
 			$ignore = false;
-			foreach ( self::$ignoreNeedles as $needle ) {
-				if ( strpos( $message, $needle ) !== false ) {
-					$ignore = true;
+			if ( isset( $wgLocalBagIgnoreNeedles ) ) {
+				foreach ( $wgLocalBagIgnoreNeedles as $needle ) {
+					if ( strpos( $message, $needle ) !== false ) {
+						$ignore = true;
+					}
 				}
 			}
 
